@@ -47,7 +47,8 @@ class Server:
         self._clients[u] = g
 
         print()
-        print("[REGISTRATION]")
+        print("[REGISTRATION] " + \
+              "should only be done on a MITM-proof secured channel")
         print("[C -> S]")
         print("u : " + u.hex())
         print("p : " + p.hex())
