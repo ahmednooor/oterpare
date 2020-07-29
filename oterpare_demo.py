@@ -55,7 +55,7 @@ class Server:
 
         return True
 
-    def init_auth(self, u):
+    def init_session(self, u):
         if u not in self._clients:
             return (None, None)
 
@@ -72,7 +72,7 @@ class Server:
         m = encrypt(text=n, key=h)
 
         print()
-        print("[INIT_AUTH]")
+        print("[INIT]")
         print("[C -> S]")
         print("u : " + u.hex())
         print("[S -> C]")
@@ -81,7 +81,7 @@ class Server:
 
         return (j, m)
 
-    def authenticate(self, u, e, x):
+    def authenticate_and_exchange(self, u, e, x):
         if u not in self._clients:
             return (None, None)
         
@@ -107,7 +107,7 @@ class Server:
         del self._rand_nums[i]
 
         print()
-        print("[AUTHENTICATE]")
+        print("[AUTHENTICATE & EXCHANGE]")
         print("RESOURCE [S]: " + self.RESOURCE.hex())
         print("[C -> S]")
         print("u : " + u.hex())
@@ -133,8 +133,8 @@ class Client:
         print(self.is_registered)
         return self.is_registered
 
-    def authenticate_with(self, server: Server):
-        (j, m) = server.init_auth(self.u)
+    def authenticate_and_exchange_with(self, server: Server):
+        (j, m) = server.init_session(self.u)
         
         if j is None or m is None:
             return False
@@ -147,7 +147,7 @@ class Client:
         k = hash(text=h+n, salt=h+n)
         x = encrypt(text=k, key=k)
 
-        (v, r) = server.authenticate(self.u, e, x)
+        (v, r) = server.authenticate_and_exchange(self.u, e, x)
 
         if v is None or r is None:
             return False
@@ -158,7 +158,7 @@ class Client:
         self.RESOURCE = decrypt(text=r, key=k)
 
         print()
-        print("[AUTHENTICATED]")
+        print("[EXCHANGED]")
         print("RESOURCE [C]: " + self.RESOURCE.hex())
 
         return True
@@ -169,11 +169,12 @@ def main():
     server = Server(b"_server_private_key_not_shared_with_anyone")
 
     print()
-    print("[j, m, e, x, v, r] will be different on each iteration")
+    print("[j, m, e, x, v, r] will be different on each iteration, but the " + \
+          "RESOURCE will remain same")
 
     is_registered = client.register_with(server)
     # ^ this operation should only be done on a MITM-proof secured channel
-    is_authenticated = client.authenticate_with(server)
+    is_authenticated = client.authenticate_and_exchange_with(server)
 
     print()
     print("[IS_REGISTERED]")
