@@ -160,6 +160,7 @@ class Client:
         print()
         print("[EXCHANGED]")
         print("RESOURCE [C]: " + self.RESOURCE.hex())
+        print("k [KEY C, S]: " + k.hex())
 
         return True
 
@@ -169,7 +170,7 @@ def main():
     server = Server(b"_server_private_key_not_shared_with_anyone")
 
     print()
-    print("[j, m, e, x, v, r] will be different on each iteration, but the " + \
+    print("[j, m, e, x, v, r, k] will be different on each iteration, but the " + \
           "RESOURCE will remain same")
 
     is_registered = client.register_with(server)
